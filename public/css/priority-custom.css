@@ -1,0 +1,84 @@
+.footer{background: #444!important;color: #fff !important;}
+.footer .footer-links ul li a{color: #fff !important;}
+.footer .footer-links{margin-bottom:0px !important; border-bottom:1px solid #333;padding-bottom:15px;}
+.footer-links h6{
+    font-size: 17px;
+    color: #3886dd;
+    font-weight: bolder;
+    text-transform: capitalize;
+}
+.featured-news .show-more {
+    display: block;
+    background: #035abc;
+    color: #fff;
+    border: 0;
+    padding: 10px 20px;
+    font-weight: 700;
+}
+
+.dropdown-menu {
+border-radius: 0px 0px 5px 5px;
+border-bottom:5px solid #035abc !important;
+border-top:0px solid #fff !important;
+border-left:0px solid #fff !important;
+border-right:0px solid #fff !important;
+margin-top: 8px !important;
+}
+.vice-chancellor{
+	padding:23px 15px !important;
+}
+.lg-links-left .link-div{
+	padding:13px 5px !important;
+}
+
+.f-departments-section h3,.feature-header {
+    margin-bottom: 20px !important;
+    border-top: 3px solid #035abc;
+    display: inline-block;
+    border-bottom: 3px solid #035abc;
+	border-left:1px solid #f4f4f4;
+	border-right:1px solid #f4f4f4;
+    border-radius: 4px;
+    padding: 10px 20px;
+}
+
+h2.text-center {
+    margin-bottom: 20px !important;
+    border-top: 3px solid #035abc;
+    border-bottom: 3px solid #035abc;
+	border-left: 1px solid #f4f4f4;
+	border-right:1px solid #f4f4f4;
+    border-radius: 4px;
+    padding: 10px 20px;
+	max-width:300px;
+	margin:0 auto;
+}
+.card-2 {
+	border-top:solid 4px #999 !important;
+	border-left:1px solid #f4f4f4;
+	border-right:1px solid #f4f4f4;
+	border-bottom:1px solid #f4f4f4;
+	border-radius: 4px !important;
+	
+	}
+.card-1{
+	border-top:solid 4px #999 !important;
+	border-left:1px solid #f4f4f4;
+	border-right:1px solid #f4f4f4;
+	border-bottom:1px solid #f4f4f4;
+	border-radius: 4px !important;
+	
+	}
+.f-departments-section, .notice-section{
+Padding: 15px 0 0 0 !important;
+}
+#departments {
+    margin-bottom: 0px !important;
+}
+.carousel-caption h5{
+	padding:0 0 5px 0;
+}
+.topic-details img{
+	border:2px solid #eee;
+	border-radius:3px;
+}

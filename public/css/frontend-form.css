@@ -1,0 +1,185 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap");
+
+.ju-form-bg {
+  background: rgba(3, 91, 188, 0.05);
+  padding: 20px;
+  font-family: "Poppins", sans-serif;
+  margin: 0 0 20px 0;
+  border-radius: 5px;
+}
+
+.ju-form h1 {
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+}
+
+.ju-form p {
+  text-align: center;
+  width: 100%;
+}
+
+.ju-padding-0 {
+  padding: 0 15px 0 0;
+}
+
+.ju-padding-0:last-child {
+  padding: 0;
+}
+
+.ju-w-100 {
+  width: 100%;
+}
+
+.col-form-label {
+  font-size: 16px;
+  color: #000;
+  font-weight: bold;
+  width: 100%;
+}
+
+.ju-form-bg select {
+  border-bottom: 1px solid #035bbc;
+  border-radius: 0;
+  background: no-repeat;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  padding: 10px 5px;
+  width: 100%;
+}
+
+.ju-form-bg select:hover,
+.ju-form-bg select:active,
+.ju-form-bg select:focus {
+  color: #495057;
+  background-color: #c0d6ee;
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2px rgb(0 0 1 / 25%);
+}
+
+.ju-form-bg select.jufbs {
+  /* styling */
+  display: inline-block;
+  font: inherit;
+  line-height: 1.5em;
+  padding: 0.5em 3.5em 0.5em 1em;
+
+  /* reset */
+
+  margin: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+select.jufbs {
+  background-image: linear-gradient(45deg, transparent 50%, gray 50%),
+    linear-gradient(135deg, gray 50%, transparent 50%),
+    linear-gradient(to right, #ccc, #ccc);
+  background-position: calc(100% - 20px) calc(1em + 2px),
+    calc(100% - 15px) calc(1em + 2px), calc(100% - 2.5em) 0.5em;
+  background-size: 5px 5px, 5px 5px, 1px 1.5em;
+  background-repeat: no-repeat;
+}
+
+select.jufbs:focus {
+  background-image: linear-gradient(45deg, green 50%, transparent 50%),
+    linear-gradient(135deg, transparent 50%, green 50%),
+    linear-gradient(to right, #ccc, #ccc);
+  background-position: calc(100% - 15px) 1em, calc(100% - 20px) 1em,
+    calc(100% - 2.5em) 0.5em;
+  background-size: 5px 5px, 5px 5px, 1px 1.5em;
+  background-repeat: no-repeat;
+  border-color: green;
+  outline: 0;
+}
+
+.ju-form-bg input,
+.ju-form-bg textarea {
+  border-bottom: 1px solid #035bbc;
+  border-radius: 0;
+  background: no-repeat;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  padding: 10px 5px;
+}
+
+.ju-form-bg input:hover,
+.ju-form-bg input:active,
+.ju-form-bg input:focus,
+.ju-form-bg textarea:hover,
+.ju-form-bg textarea:active,
+.ju-form-bg textarea:focus {
+  color: #222;
+  background-color: #c0d6ee;
+  border-color: #c0d6ee;
+  outline: 0;
+  box-shadow: 0 0 0 0.2px rgb(0 0 1 / 25%);
+}
+
+.ju-form-bg .input-group-prepend {
+  width: 100%;
+}
+
+.ju-form-bg .btn-outline-secondary {
+  width: 100%;
+  border-bottom: 1px solid #035bbc;
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+}
+
+.ju-f-u {
+  width: 100%;
+  border: 1px dashed #035bbc;
+  text-align: center;
+}
+
+.dashed-error {
+  border: 1px dashed #dc3545;
+}
+
+#imgInp {
+  border-bottom: 0;
+  max-width: 215px;
+}
+
+#imgInp:hover {
+  background: none;
+  color: #000;
+}
+
+.ju-tac {
+  text-align: center;
+}
+
+.ju-tac-inn {
+  text-align: center;
+  width: 100%;
+}
+
+.ju-tac input,
+.ju-tac textarea,
+.ju-tac label {
+  display: inline;
+}
+
+.ju-button-root {
+  justify-content: center;
+}
+
+.ju-button-root button {
+  width: 220px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.ju-button-root button:hover {
+  background: #444;
+  border: 1px solid #444;
+  color: #fff;
+}

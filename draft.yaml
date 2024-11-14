@@ -1,0 +1,32 @@
+models:
+  AdmissionSession:
+    name: string unique
+
+  Program:
+    name: string unique
+
+  StudentEmailApply:
+    admission_session_id: id foreign
+    department_id: id foreign
+    program_id: id foreign
+    hall_id: id foreign nullable
+    regestration_number: string
+    name: string
+    username: string unique nullable
+    contact_phone: string
+    existing_email: string nullable
+    image: string nullable
+    relationships:
+      belongsTo: AdmissionSession, Program, Department, Hall
+
+controllers:
+  Laralum/StudentEmailApply:
+    index:
+      query: all
+      render: laralum.student-domain-apply.index with:applyEmails
+    create:
+      render: laralum.student-domain-apply.create
+    store:
+      validate: admission_session_id, department_id, program_id, regestration_number, name, contact_phone
+      save: StudentEmailApply
+      redirect: StudentEmailApply.index
