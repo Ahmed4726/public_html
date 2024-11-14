@@ -1,97 +1,132 @@
-![Guzzle](.github/logo.png?raw=true)
+Guzzle, PHP HTTP client and webservice framework
+================================================
 
-# Guzzle, PHP HTTP client
+Guzzle is a game changer in the world of PHP HTTP clients. Guzzle allows you to truly reap the benefits of the HTTP/1.1 spec. No other library makes it easier to manage persistent connections or send requests in parallel.</p>
 
-[![Latest Version](https://img.shields.io/github/release/guzzle/guzzle.svg?style=flat-square)](https://github.com/guzzle/guzzle/releases)
-[![Build Status](https://img.shields.io/github/workflow/status/guzzle/guzzle/CI?label=ci%20build&style=flat-square)](https://github.com/guzzle/guzzle/actions?query=workflow%3ACI)
-[![Total Downloads](https://img.shields.io/packagist/dt/guzzlehttp/guzzle.svg?style=flat-square)](https://packagist.org/packages/guzzlehttp/guzzle)
+In addition to taking the pain out of HTTP, Guzzle provides a lightweight framework for creating web service clients.  Most web service clients follow a specific pattern: create a client class, create methods for each action, create and execute a cURL handle, parse the response, implement error handling, and return the result. Guzzle takes the redundancy out of this process and gives you the tools you need to quickly build a web service client.
 
-Guzzle is a PHP HTTP client that makes it easy to send HTTP requests and
-trivial to integrate with web services.
+Start <strong>truly</strong> consuming HTTP with Guzzle.
 
-- Simple interface for building query strings, POST requests, streaming large
-  uploads, streaming large downloads, using HTTP cookies, uploading JSON data,
-  etc...
-- Can send both synchronous and asynchronous requests using the same interface.
-- Uses PSR-7 interfaces for requests, responses, and streams. This allows you
-  to utilize other PSR-7 compatible libraries with Guzzle.
-- Abstracts away the underlying HTTP transport, allowing you to write
-  environment and transport agnostic code; i.e., no hard dependency on cURL,
-  PHP streams, sockets, or non-blocking event loops.
-- Middleware system allows you to augment and compose client behavior.
+- [Download the phar](http://guzzlephp.org/guzzle.phar) and include it in your project ([minimal phar](http://guzzlephp.org/guzzle-min.phar))
+- Docs: [www.guzzlephp.org](http://www.guzzlephp.org/)
+- Forum: https://groups.google.com/forum/?hl=en#!forum/guzzle
+- IRC: [#guzzlephp](irc://irc.freenode.net/#guzzlephp) channel on irc.freenode.net
 
-```php
-$client = new \GuzzleHttp\Client();
-$response = $client->request('GET', 'https://api.github.com/repos/guzzle/guzzle');
+[![Build Status](https://secure.travis-ci.org/guzzle/guzzle.png)](http://travis-ci.org/guzzle/guzzle)
 
-echo $response->getStatusCode(); # 200
-echo $response->getHeaderLine('content-type'); # 'application/json; charset=utf8'
-echo $response->getBody(); # '{"id": 1420053, "name": "guzzle", ...}'
+Features
+--------
 
-# Send an asynchronous request.
-$request = new \GuzzleHttp\Psr7\Request('GET', 'http://httpbin.org');
-$promise = $client->sendAsync($request)->then(function ($response) {
-    echo 'I completed! ' . $response->getBody();
-});
+- Supports GET, HEAD, POST, DELETE, PUT, and OPTIONS
+- Allows full access to request and response headers
+- Persistent connections are implicitly managed by Guzzle, resulting in huge performance benefits
+- Send requests in parallel
+- Cookie sessions can be maintained between requests using the CookiePlugin
+- Allows custom entity bodies to be sent in PUT and POST requests, including sending data from a PHP stream
+- Responses can be cached and served from cache using the caching reverse proxy plugin
+- Failed requests can be retried using truncated exponential backoff
+- Entity bodies can be validated automatically using Content-MD5 headers
+- All data sent over the wire can be logged using the LogPlugin
+- Automatically requests compressed data and automatically decompresses data
+- Subject/Observer signal slot system for unobtrusively modifying request behavior
+- Supports all of the features of libcurl including authentication, redirects, SSL, proxies, etc
+- Web service client framework for building future-proof interfaces to web services
 
-$promise->wait();
-```
-
-## Help and docs
-
-We use GitHub issues only to discuss bugs and new features. For support please refer to:
-
-- [Documentation](https://docs.guzzlephp.org)
-- [Stack Overflow](https://stackoverflow.com/questions/tagged/guzzle)
-- [#guzzle](https://app.slack.com/client/T0D2S9JCT/CE6UAAKL4) channel on [PHP-HTTP Slack](https://slack.httplug.io/)
-- [Gitter](https://gitter.im/guzzle/guzzle)
-
-
-## Installing Guzzle
-
-The recommended way to install Guzzle is through
-[Composer](https://getcomposer.org/).
-
-```bash
-# Install Composer
-curl -sS https://getcomposer.org/installer | php
-```
-
-Next, run the Composer command to install the latest stable version of Guzzle:
-
-```bash
-composer require guzzlehttp/guzzle
-```
-
-After installing, you need to require Composer's autoloader:
+HTTP basics
+-----------
 
 ```php
-require 'vendor/autoload.php';
+<?php
+
+use Guzzle\Http\Client;
+
+$client = new Client('http://www.example.com/api/v1/key/{{key}}', array(
+    'key' => '***'
+));
+
+// Issue a path using a relative URL to the client's base URL
+// Sends to http://www.example.com/api/v1/key/***/users
+$request = $client->get('users');
+$response = $request->send();
+
+// Relative URL that overwrites the path of the base URL
+$request = $client->get('/test/123.php?a=b');
+
+// Issue a head request on the base URL
+$response = $client->head()->send();
+// Delete user 123
+$response = $client->delete('users/123')->send();
+
+// Send a PUT request with custom headers
+$response = $client->put('upload/text', array(
+    'X-Header' => 'My Header'
+), 'body of the request')->send();
+
+// Send a PUT request using the contents of a PHP stream as the body
+// Send using an absolute URL (overrides the base URL)
+$response = $client->put('http://www.example.com/upload', array(
+    'X-Header' => 'My Header'
+), fopen('http://www.test.com/', 'r'));
+
+// Create a POST request with a file upload (notice the @ symbol):
+$request = $client->post('http://localhost:8983/solr/update', null, array (
+    'custom_field' => 'my value',
+    'file' => '@/path/to/documents.xml'
+));
+
+// Create a POST request and add the POST files manually
+$request = $client->post('http://localhost:8983/solr/update')
+    ->addPostFiles(array(
+        'file' => '/path/to/documents.xml'
+    ));
+
+// Responses are objects
+echo $response->getStatusCode() . ' ' . $response->getReasonPhrase() . "\n";
+
+// Requests and responses can be cast to a string to show the raw HTTP message
+echo $request . "\n\n" . $response;
+
+// Create a request based on an HTTP message
+$request = RequestFactory::fromMessage(
+    "PUT / HTTP/1.1\r\n" .
+    "Host: test.com:8081\r\n" .
+    "Content-Type: text/plain"
+    "Transfer-Encoding: chunked\r\n" .
+    "\r\n" .
+    "this is the body"
+);
 ```
 
-You can then later update Guzzle using composer:
+Send requests in parallel
+-------------------------
 
- ```bash
-composer update
- ```
+```php
+<?php
 
+try {
+    $client = new Guzzle\Http\Client('http://www.myapi.com/api/v1');
+    $responses = $client->send(array(
+        $client->get('users'),
+        $client->head('messages/123'),
+        $client->delete('orders/123')
+    ));
+} catch (Guzzle\Common\ExceptionCollection $e) {
+    echo "The following requests encountered an exception: \n";
+    foreach ($e as $exception) {
+        echo $exception->getRequest() . "\n" . $exception->getMessage() . "\n";
+    }
+}
+```
 
-## Version Guidance
+Testing Guzzle
+--------------
 
-| Version | Status         | Packagist           | Namespace    | Repo                | Docs                | PSR-7 | PHP Version  |
-|---------|----------------|---------------------|--------------|---------------------|---------------------|-------|--------------|
-| 3.x     | EOL            | `guzzle/guzzle`     | `Guzzle`     | [v3][guzzle-3-repo] | [v3][guzzle-3-docs] | No    | >=5.3.3,<7.0 |
-| 4.x     | EOL            | `guzzlehttp/guzzle` | `GuzzleHttp` | [v4][guzzle-4-repo] | N/A                 | No    | >=5.4,<7.0   |
-| 5.x     | EOL            | `guzzlehttp/guzzle` | `GuzzleHttp` | [v5][guzzle-5-repo] | [v5][guzzle-5-docs] | No    | >=5.4,<7.4   |
-| 6.x     | Security fixes | `guzzlehttp/guzzle` | `GuzzleHttp` | [v6][guzzle-6-repo] | [v6][guzzle-6-docs] | Yes   | >=5.5,<8.0   |
-| 7.x     | Latest         | `guzzlehttp/guzzle` | `GuzzleHttp` | [v7][guzzle-7-repo] | [v7][guzzle-7-docs] | Yes   | >=7.2.5,<8.2 |
+Here's how to install Guzzle from source to run the unit tests:
 
-[guzzle-3-repo]: https://github.com/guzzle/guzzle3
-[guzzle-4-repo]: https://github.com/guzzle/guzzle/tree/4.x
-[guzzle-5-repo]: https://github.com/guzzle/guzzle/tree/5.3
-[guzzle-6-repo]: https://github.com/guzzle/guzzle/tree/6.5
-[guzzle-7-repo]: https://github.com/guzzle/guzzle
-[guzzle-3-docs]: https://guzzle3.readthedocs.io/
-[guzzle-5-docs]: https://docs.guzzlephp.org/en/5.3/
-[guzzle-6-docs]: https://docs.guzzlephp.org/en/6.5/
-[guzzle-7-docs]: https://docs.guzzlephp.org/en/latest/
+```
+git clone git@github.com:guzzle/guzzle.git
+cd guzzle
+composer.phar install --install-suggests
+cp phpunit.xml.dist phpunit.xml
+phpunit
+```
