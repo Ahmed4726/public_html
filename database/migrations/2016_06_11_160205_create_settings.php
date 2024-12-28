@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
-use App\Settings;
+use App\Setting;
 
 class CreateSettings extends Migration
 {
@@ -24,10 +24,11 @@ class CreateSettings extends Migration
             $table->string('bar_chart_source');
             $table->string('line_chart_source');
             $table->string('geo_chart_source');
+            $table->string('email');
             $table->timestamps();
         });
 
-        $settings = new Settings;
+        $settings = new Setting;
         $settings->laralum_version = "2.1.3";
         $settings->website_title = env('APP_NAME', 'My Application');
         $settings->logo = ''; //Default logo will load

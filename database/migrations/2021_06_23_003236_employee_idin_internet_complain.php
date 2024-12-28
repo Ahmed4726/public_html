@@ -14,7 +14,6 @@ class EmployeeIdinInternetComplain extends Migration
     public function up()
     {
         Schema::table('internet_complains', function (Blueprint $table) {
-            $table->string('employee_id')->nullable()->after('name');
         });
     }
 

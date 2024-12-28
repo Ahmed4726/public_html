@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Str;
 
 class CreateUsersTable extends Migration
 {
@@ -38,7 +39,7 @@ class CreateUsersTable extends Migration
         $user->register_ip = "";
         $user->country_code = env('USER_COUNTRY_CODE', 'ES');
         $user->locale = env('USER_LOCALE', 'en');
-        $user->activation_key = str_random(25);
+        $user->activation_key = Str::random(25);  // Generates a random 25-character string
         $user->su = true;
         $user->save();
 

@@ -20,34 +20,48 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-//        Paginator::defaultView('pagination::bootstrap-4');
-
+        // Force HTTPS in production environment
         if (env('APP_ENV') == 'production') {
             URL::forceScheme('https');
         }
-
-        $allMenus = Menu::allWithOptionalFilter(false, false, 1, false, 1000);
-
-        foreach ($allMenus->where('type', 'MENU') as $key => $menu) {
-            $allMenus[$key]['subMenu'] = $allMenus->where('root_id', $menu->id)->where('type', 'SUB_MENU');
+    
+        // Check if the environment is production
+        if (env('APP_ENV') === 'production') {
+            // Fetch menus only in production environment
+            try {
+                $allMenus = Menu::allWithOptionalFilter(false, false, 1, false, 1000);
+    
+                // Populate sub-menu data
+                foreach ($allMenus->where('type', 'MENU') as $key => $menu) {
+                    $allMenus[$key]['subMenu'] = $allMenus->where('root_id', $menu->id)->where('type', 'SUB_MENU');
+                }
+    
+                // Share menus with the frontend header view
+                View::composer(['frontend.layout.header'], function ($view) use ($allMenus) {
+                    $view->with('menus', $allMenus->where('type', 'MENU'));
+                });
+    
+                // Share footer links
+                View::composer(['frontend.layout.footer'], function ($view) use ($allMenus) {
+                    $view->with('links', Link::whereIn('type_id', [5, 2, 4])->whereNull('department_id')->whereEnabled(1)->get());
+                });
+    
+                // Share site settings with both header and footer views
+                View::composer(['frontend.layout.header', 'frontend.layout.footer'], function ($view) {
+                    $view->with('setting', Setting::first());
+                });
+            } catch (\Exception $e) {
+                // Log error in case of failure
+                \Log::error('Error fetching menus: ' . $e->getMessage());
+            }
         }
-
-        View::composer(['frontend.layout.header'], function ($view) use ($allMenus) {
-            $view->with('menus', $allMenus->where('type', 'MENU'));
-        });
-
-        View::composer(['frontend.layout.footer'], function ($view) use ($allMenus) {
-            $view->with('links', Link::whereIn('type_id', [5, 2, 4])->whereNull('department_id')->whereEnabled(1)->get());
-        });
-
-        View::composer(['frontend.layout.header', 'frontend.layout.footer'], function ($view) {
-            $view->with('setting', Setting::first());
-        });
-
+    
+        // Register a helper class in the container
         $this->app->singleton('helper', function ($app) {
             return new Helper;
         });
     }
+    
 
     /**
      * Register any application services.
