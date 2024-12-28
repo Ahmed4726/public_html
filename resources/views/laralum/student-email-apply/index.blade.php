@@ -197,10 +197,15 @@
 
     <div class="column">
         <div class="ui padded segment" id="vue-app">
-
+            <form method="POST" action="/admin/student-email-apply/bulk-delete">
+                @csrf
+                <button type="submit" class="ui red button" id="bulk-delete-btn" disabled>
+                    <i class="trash red alternate outline icon"></i> Delete Selected
+                </button>
             <table class="ui selectable padded compact striped celled small table">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" id="select-all"></th>
                         <th>Session</th>
                         <th>Registration</th>
                         <th>Name</th>
@@ -214,6 +219,7 @@
                 <tbody>
                     @foreach($emails as $email)
                     <tr>
+                        <td><input type="checkbox" name="ids[]" value="{{ $email->id }}" class="select-checkbox"></td>
                         <td>{{ optional($email->admissionSession)->name }}</td>
                         <td>{{ $email->registration_number }}</td>
                         <td>{{ $email->name }}</td>
@@ -306,7 +312,7 @@
                 <div class="ui icon header">
                     <div class="ui input">
                         <input type="text" placeholder="Reason for Reject..." style="padding: .45em 1em;" name="comment"
-                            v-model="comment" required>
+                            v-model="comment">
                     </div>
                 </div>
 
@@ -386,6 +392,28 @@
             }
         }
     });
+    $(document).ready(function() {
+    // Toggle Select All checkboxes
+    $('#select-all').on('change', function() {
+        var checked = $(this).prop('checked');
+        $('.select-checkbox').prop('checked', checked);
+        toggleBulkDeleteButton();
+    });
+
+    // Enable/disable the bulk delete button based on the selected checkboxes
+    $('.select-checkbox').on('change', function() {
+        toggleBulkDeleteButton();
+    });
+
+    // Function to enable/disable the bulk delete button
+    function toggleBulkDeleteButton() {
+        var selected = $('.select-checkbox:checked').length > 0;
+        $('#bulk-delete-btn').prop('disabled', !selected);
+    }
+
+    // Initially check the state of the checkboxes
+    toggleBulkDeleteButton();
+});
 
     $(document).ready( function() {
         flatpickr("#range", {mode: "range"});

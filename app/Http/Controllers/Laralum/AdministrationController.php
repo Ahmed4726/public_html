@@ -335,6 +335,7 @@ class AdministrationController extends Controller
 
     public function profileView(AdministrativeMember $admin)
     {
+        dd('oks');
         $data['member'] = $admin;
         $data['rollName'] = '';
         return view('frontend.admin.member-view', $data);

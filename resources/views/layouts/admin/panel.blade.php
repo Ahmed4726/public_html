@@ -97,7 +97,7 @@
 						</div>
 					</a>
 
-					@can('ADMIN')
+					{{-- @can('ADMIN') --}}
 					<div class="item">
 						<div class="header">User</div>
 						<div class="menu">
@@ -106,9 +106,9 @@
 								Type</a>
 						</div>
 					</div>
-					@endcan
+					{{-- @endcan --}}
 
-					@can('ADMIN')
+					{{-- @can('ADMIN') --}}
 					<div class="item">
 						<div class="header">Administration</div>
 						<div class="menu">
@@ -120,9 +120,9 @@
 								class="item active selection">Administrative Role Type</a>
 						</div>
 					</div>
-					@endcan
+					{{-- @endcan --}}
 
-					@can('ADMIN')
+					{{-- @can('ADMIN') --}}
 					<div class="item">
 						<div class="header">Custom Page</div>
 						<div class="menu">
@@ -130,7 +130,7 @@
 								Page</a>
 						</div>
 					</div>
-					@endcan
+					{{-- @endcan --}}
 
 					@can('DEAN')
 					<div class="item">
@@ -207,7 +207,7 @@
 					</div>
 					@endcan
 
-					@can('ADMIN')
+					{{-- @can('ADMIN') --}}
 					<div class="item">
 						<div class="header">Program / Calender</div>
 						<div class="menu">
@@ -217,7 +217,7 @@
 								/ Calender Type</a>
 						</div>
 					</div>
-					@endcan
+					{{-- @endcan --}}
 
 					@can('ADMIN')
 					<div class="item">

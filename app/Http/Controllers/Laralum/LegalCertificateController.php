@@ -81,6 +81,28 @@ class LegalCertificateController extends Controller
         return redirect()->route('Laralum::certificate::list')->with('success', 'NOC/GO Deleted Successfully');
     }
 
+    public function bulkDelete(Request $request)
+    {
+        // Authorize the action for bulk deletion
+        $this->authorize('NOC');
+
+        // Retrieve the selected certificate IDs from the request
+        $certificateIds = $request->input('selected_certificates');
+
+        // Check if any IDs are provided
+        if (!empty($certificateIds)) {
+            // Perform the bulk deletion
+            LegalCertificate::whereIn('id', $certificateIds)->delete();
+
+            // Redirect back with a success message
+            return redirect()->route('Laralum::certificate::list')->with('success', 'Selected NOC/GO(s) Deleted Successfully');
+        }
+
+        // Redirect back with an error message if no IDs were selected
+        return redirect()->route('Laralum::certificate::list')->with('error', 'No NOC/GO(s) were selected for deletion');
+    }
+
+
     /**
      * @param LegalCertificate $certificate
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View

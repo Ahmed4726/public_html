@@ -11,6 +11,8 @@
 |
 */
 
+use App\Http\Controllers\Laralum\StudentEmailApplyController;
+
 Route::get('/link-storage', function () {
     Artisan::call('storage:link');
 //    symlink('/home/devju/storage/app/public', '/home/devju/public_html/storage');
@@ -175,6 +177,10 @@ Route::get('department/{department}/file/{file}', 'Laralum\DepartmentController@
 Route::get('discussion/{discussion}/file/{file}', 'Laralum\SettingsController@fileView')->name('event::file::view');
 
 Route::group(['middleware' => ['auth', 'laralum.base', 'laralum.auth'], 'prefix' => 'admin', 'namespace' => 'Laralum', 'as' => 'Laralum::'], function () {
+    Route::post('/bulkDeleteEvent', 'SettingsController@bulkDelete')->name('bulkDeleteEvent');
+    Route::post('student-email-apply/bulk-delete', [StudentEmailApplyController::class, 'bulkDelete'])->name('student-email-apply-bulk-delete');
+
+
     Route::group(['prefix' => 'student', 'as' => 'student::'], function () {
         Route::get('', 'StudentController@index')->name('list');
         Route::get('upload', 'StudentController@uploadView')->name('upload-view');
@@ -542,6 +548,7 @@ Route::group(['middleware' => ['auth', 'laralum.base', 'laralum.auth'], 'prefix'
         Route::get('create', 'LegalCertificateController@create')->name('create');
         Route::post('create', 'LegalCertificateController@store')->name('store');
         Route::get('{certificate}/delete', 'LegalCertificateController@delete')->name('delete');
+        Route::post('bulkDelete', 'LegalCertificateController@bulkDelete')->name('bulkDelete');
         Route::get('{certificate}/edit', 'LegalCertificateController@edit')->name('edit');
         Route::post('{certificate}/edit', 'LegalCertificateController@update')->name('update');
 

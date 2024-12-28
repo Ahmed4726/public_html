@@ -14,6 +14,7 @@ class DashboardController extends Controller
      */
     public function index()
     {
+
         $teacherByDesignation = TeacherDesignation::withCount(['teachers' => function ($query) {
             $query->whereIn('status', [1, 2, 4]);
         }])->get();

@@ -673,6 +673,46 @@ class SettingsController extends Controller
             return redirect()->route('Laralum::event::list')->with('success', 'All Notice Deleted Successfully ');
     }
 
+
+    public function bulkDelete(Request $request)
+    {
+        // Ensure the user is authorized to perform the action
+        // Check the specific department or event authorization based on the user's role and request
+        $discussionIds = $request->input('selected_discussions');
+
+        if (empty($discussionIds)) {
+            return redirect()->route('Laralum::event::list')->with('error', 'No Notice(s) selected for deletion.');
+        }
+
+        // Check authorization for the selected discussions
+        $discussions = DiscussionTopic::whereIn('id', $discussionIds)->get();
+
+        foreach ($discussions as $discussion) {
+            if ($discussion->department_id) {
+                $this->authorize('DEPARTMENT-SPECIFIC', $discussion->department_id);
+            } elseif (!Auth::user()->can('ADMIN') && Auth::user()->can('EVENT')) {
+                $this->authorize('EVENT-SPECIFIC', $discussion->event_id);
+            } else {
+                $this->authorize('ADMIN');
+            }
+        }
+
+        // Perform bulk delete
+        DiscussionTopic::whereIn('id', $discussionIds)->delete();
+
+        // Redirect back with success message
+        $departmentId = $discussions->first()->department_id;
+
+        if ($departmentId) {
+            return redirect()->route('Laralum::department::event::list', ['department' => $departmentId])
+                ->with('success', 'Selected Notices Deleted Successfully');
+        }
+
+        return redirect()->route('Laralum::event::list')
+            ->with('success', 'Selected Notices Deleted Successfully');
+    }
+
+
     /**
      * @param DiscussionTopic $discussion
      * @param Request $request

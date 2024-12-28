@@ -10,7 +10,7 @@
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Home</a></li>
                     <li class="breadcrumb-item"><a href="#">Faculty</a></li>
-                    @if($data['faculty'])
+                    @if(isset($data['faculty']))
                     <li class="breadcrumb-item active" aria-current="page">{{$data['faculty']->name}}
                         @endif
                     </li>
@@ -19,7 +19,7 @@
         </div>
     </div>
 
-    @if($data['faculty'])
+    @if(isset($data['faculty']))
 
     <div class="banner-inner p-2" style="margin-bottom: 20px;" id="vue-app">
 

@@ -109,32 +109,24 @@
                 </div>
             </form>
         </div>
-
     </div>
 </div>
 @endsection
 
-
 @section('js')
-{{-- <script src="https://cdn.tiny.cloud/1/zbgkypr4zql81wjmlop63u6tbcu83synj6nql15gueb6zxfk/tinymce/5/tinymce.min.js"
-    referrerpolicy="origin"></script> --}}
 <script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
-    
+
 <script type="text/javascript">
     ClassicEditor
-            .create( document.querySelector( '#description' ))
-            .catch( error => {
-                console.error( error );
-            });
-    // tinymce.init({
-    //         selector:'#description',
-    //         plugins: "advlist autolink link image lists charmap print preview autoresize table code",
-    //         toolbar: "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | forecolor backcolor"
-    //     });
-        /*setTimeout(function(){
-            CKEDITOR.replace( 'description' );
-        },100);*/
+        .create(document.querySelector('#description'))
+        .catch(error => {
+            console.error(error);
+        });
 
+    ClassicEditor
+        .create(document.querySelector('#iframe'))
+        .catch(error => {
+            console.error(error);
+        });
 </script>
-
 @endsection

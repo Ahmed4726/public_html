@@ -364,6 +364,25 @@ class StudentEmailApplyController extends Controller
         return redirect()->route('Laralum::student-email-apply::list')->with('success', 'Student Email Deleted Successfully');
     }
 
+    public function bulkDelete(Request $request)
+    {
+        // Authorize the action (same as the destroy method, you can adjust the permission accordingly)
+        $this->authorize('ADMIN');
+
+        // Validate that 'ids' are an array and all values exist in the student_email_applies table
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:student_email_applies,id',  // Ensure the IDs exist in the database
+        ]);
+
+        // Delete all selected records
+        StudentEmailApply::whereIn('id', $validated['ids'])->delete();
+
+        // Return a success message
+        return redirect()->route('Laralum::student-email-apply::list')->with('success', 'Selected student emails have been deleted successfully.');
+    }
+
+
     /**
      * Email Apply View Page
      *

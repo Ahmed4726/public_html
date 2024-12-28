@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Laralum;
 
 use App\Department;
+use App\Event;
 use App\Faculty;
 use App\Http\Controllers\Controller;
 use App\UserTeacher;
@@ -179,8 +180,10 @@ class FacultyController extends Controller
      */
     public function view($slug)
     {
+        $data = [];
         $data['faculty'] = Faculty::getBySlug($slug);
-        return view('frontend.faculty.view', $data);
+        $data['events'] = [];
+        return view('frontend.faculty.view',compact('data'));
     }
 
     public function jsonSearch(Request $request)
