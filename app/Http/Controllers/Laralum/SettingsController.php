@@ -750,7 +750,7 @@ class SettingsController extends Controller
         Laralum::permissionToAccess('laralum.settings.access');
 
         # Check permissions
-        $row = Settings::first();
+        $row = Setting::first();
 
         $data_index = 'settings';
         require('Data/Edit/Get.php');
@@ -784,7 +784,7 @@ class SettingsController extends Controller
         # Check permissions
         Laralum::permissionToAccess('laralum.settings.edit');
 
-        $row = Settings::first();
+        $row = Setting::first();
 
         $data_index = 'settings';
         require('Data/Edit/Save.php');

@@ -10,14 +10,8 @@ trait SortsQuery
     /** @var \Illuminate\Support\Collection */
     protected $allowedSorts;
 
-    public function allowedSorts($sorts): self
+    public function allowedSorts($sorts): static
     {
-        if ($this->request->sorts()->isEmpty()) {
-            // We haven't got any requested sorts. No need to parse allowed sorts.
-
-            return $this;
-        }
-
         $sorts = is_array($sorts) ? $sorts : func_get_args();
 
         $this->allowedSorts = collect($sorts)->map(function ($sort) {
@@ -40,9 +34,11 @@ trait SortsQuery
      *
      * @return \Spatie\QueryBuilder\QueryBuilder
      */
-    public function defaultSort($sorts): self
+    public function defaultSort($sorts): static
     {
-        return $this->defaultSorts(func_get_args());
+        $sorts = is_array($sorts) ? $sorts : func_get_args();
+
+        return $this->defaultSorts($sorts);
     }
 
     /**
@@ -50,7 +46,7 @@ trait SortsQuery
      *
      * @return \Spatie\QueryBuilder\QueryBuilder
      */
-    public function defaultSorts($sorts): self
+    public function defaultSorts($sorts): static
     {
         if ($this->request->sorts()->isNotEmpty()) {
             // We've got requested sorts. No need to parse defaults.
@@ -85,7 +81,7 @@ trait SortsQuery
 
                 $sort = $this->findSort($key);
 
-                $sort->sort($this, $descending);
+                $sort?->sort($this, $descending);
             });
     }
 
@@ -99,6 +95,10 @@ trait SortsQuery
 
     protected function ensureAllSortsExist(): void
     {
+        if (config('query-builder.disable_invalid_sort_query_exception', false)) {
+            return;
+        }
+
         $requestedSortNames = $this->request->sorts()->map(function (string $sort) {
             return ltrim($sort, '-');
         });

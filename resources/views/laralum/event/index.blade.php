@@ -133,6 +133,8 @@
 @endsection
 
 @section('css')
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
     <style>
         .mini.button {
             margin: 1px !important;
@@ -142,42 +144,98 @@
 
 @section('js')
     @include('laralum.include.jquery-ui')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        $(document).ready(function () {
-            // Select all checkboxes
-            $('#select-all').on('click', function () {
-                $('input[name="selected_discussions[]"]').prop('checked', this.checked);
-            });
+$(document).ready(function () {
+    // Select all checkboxes
+    $('#select-all').on('click', function () {
+        $('input[name="selected_discussions[]"]').prop('checked', this.checked);
+    });
 
-            $('.delete').on("click", function (e) {
-                e.preventDefault();
-                var _this = $(this);
+    // Individual item deletion with SweetAlert
+    $('.delete').on("click", function (e) {
+        e.preventDefault();
+        var _this = $(this);
 
-                $('.mini.modal').modal({
-                    onApprove: function () {
-                        window.location.href = _this.attr('href');
-                    }
-                }).modal('show');
-            });
-
-            $("#from").datepicker({
-                dateFormat: 'M dd, yy',
-                changeMonth: true,
-                changeYear: true,
-                onClose: function (selectedDate) {
-                    $("#to").datepicker("option", "minDate", selectedDate);
-                }
-            });
-
-            $("#to").datepicker({
-                dateFormat: 'M dd, yy',
-                changeMonth: true,
-                changeYear: true,
-                onClose: function (selectedDate) {
-                    $("#from").datepicker("option", "maxDate", selectedDate);
-                }
-            });
+        // SweetAlert for individual item deletion
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This action will delete the discussion!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirect to delete URL if confirmed
+                window.location.href = _this.attr('href');
+            }
         });
+    });
+
+    // Bulk delete form submission with SweetAlert
+    $('#bulk-delete-form').on('submit', function (e) {
+        e.preventDefault();
+        var selectedIds = $('input[name="selected_discussions[]"]:checked').map(function () {
+            return $(this).val();
+        }).get();
+
+        if (selectedIds.length > 0) {
+            // SweetAlert2 confirmation
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This action will delete the selected discussions!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete them!',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Proceed with the bulk delete
+                    $.ajax({
+                        url: '/admin/discussion/bulkDelete', // Update this URL based on your route
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            selected_discussions: selectedIds
+                        },
+                        success: function (response) {
+                            // Reload the page after successful delete
+                            window.location.reload();
+                        },
+                        error: function () {
+                            Swal.fire('Error!', 'An error occurred while deleting. Please try again.', 'error');
+                        }
+                    });
+                }
+            });
+        } else {
+            Swal.fire('No selection', 'Please select at least one discussion to delete.', 'info');
+        }
+    });
+
+    // Datepicker initialization
+    $("#from").datepicker({
+        dateFormat: 'M dd, yy',
+        changeMonth: true,
+        changeYear: true,
+        onClose: function (selectedDate) {
+            $("#to").datepicker("option", "minDate", selectedDate);
+        }
+    });
+
+    $("#to").datepicker({
+        dateFormat: 'M dd, yy',
+        changeMonth: true,
+        changeYear: true,
+        onClose: function (selectedDate) {
+            $("#from").datepicker("option", "maxDate", selectedDate);
+        }
+    });
+});
+
     </script>
 @endsection

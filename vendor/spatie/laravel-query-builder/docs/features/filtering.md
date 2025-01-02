@@ -5,7 +5,7 @@ weight: 1
 
 The `filter` query parameters can be used to add `where` clauses to your Eloquent query. Out of the box we support filtering results by partial attribute value, exact attribute value or even if an attribute value exists in a given array of values. For anything more advanced, custom filters can be used.
 
-By default, all filters have to be explicitly allowed using `allowedFilters()`. This method takes an array of strings or `AllowedFilter` instances. An allowed filter can be partial, exact, scope or custom. By default, any string values passed to `allowedFilters()` will automatically be converted to `AllowedFilter::partial()` filters.
+By default, all filters have to be explicitly allowed using `allowedFilters()`. This method takes an array of strings or `AllowedFilter` instances. An allowed filter can be partial, beginsWithStrict, endsWithStrict, exact, scope or custom. By default, any string values passed to `allowedFilters()` will automatically be converted to `AllowedFilter::partial()` filters.
 
 ## Basic usage
 
@@ -31,6 +31,8 @@ $users = QueryBuilder::for(User::class)
 // $users will contain all users that contain "seb" OR "freek" in their name
 ```
 
+By passing column name strings to `allowedFilters`, **partial** filters are automatically applied.
+
 ## Disallowed filters
 
 Finally, when trying to filter on properties that have not been allowed using `allowedFilters()` an `InvalidFilterQuery` exception will be thrown along with a list of allowed filters.
@@ -38,13 +40,17 @@ Finally, when trying to filter on properties that have not been allowed using `a
 
 ## Disable InvalidFilterQuery exception
 
-You can set in configuration file to not throw an InvalidFilterQuery exception when a filter is not set in allowedFilter method.
+You can set in configuration file to not throw an InvalidFilterQuery exception when a filter is not set in allowedFilter method. This does **not** allow using any filter, it just disables the exception.
 
 ```php
 'disable_invalid_filter_query_exception' => true
 ```
 
 By default the option is set false.
+
+## Partial, beginsWithStrict and endsWithStrict filters
+
+By default, all values passed to `allowedFilters` are converted to partial filters. The underlying query will be modified to use a `LIKE LOWER(%value%)` statement. Because this can cause missed indexes, it's often worth considering a `beginsWithStrict` filter for the beginning of the value, or an `endsWithStrict` filter for the end of the value. These filters will use a `LIKE value%` statement and a `LIKE %value` statement respectively, instead of the default partial filter. This can help optimize query performance and index utilization.
 
 ## Exact filters
 
@@ -154,7 +160,7 @@ QueryBuilder::for(User::class)
 
 ## Trashed filters
 
-When using Laravel's [soft delete feature](https://laravel.com/docs/master/eloquent#querying-soft-deleted-models) you can use the `AllowedFilters::trashed()` filter to query these models. 
+When using Laravel's [soft delete feature](https://laravel.com/docs/master/eloquent#querying-soft-deleted-models) you can use the `AllowedFilter::trashed()` filter to query these models. 
 
 The `FiltersTrashed` filter responds to particular values:
 
@@ -175,7 +181,7 @@ QueryBuilder::for(Booking::class)
 
 ## Callback filters
 
-If you want to define a tiny custom filter, you can use a callback filter. Using `AllowedFilter::callback(string $name, callable $filter)` you can specify a callable that will executed when the filter is requested. 
+If you want to define a tiny custom filter, you can use a callback filter. Using `AllowedFilter::callback(string $name, callable $filter)` you can specify a callable that will be executed when the filter is requested. 
 
 The filter callback will receive the following parameters: `Builder $query, mixed $value, string $name`. You can modify the `Builder` object to add your own query constraints.
 
@@ -294,6 +300,23 @@ QueryBuilder::for(User::class)
     ->allowedFilters([
         AllowedFilter::exact('name')->default('Joe'),
         AllowedFilter::scope('deleted')->default(false),
+        AllowedFilter::scope('permission')->default(null),
     ])
     ->get();
 ```
+
+## Nullable Filter
+
+You can mark a filter nullable if you want to retrieve entries whose filtered value is null. This way you can apply the filter with an empty value, as shown in the example.
+
+```php
+// GET /user?filter[name]=&filter[permission]=
+
+QueryBuilder::for(User::class)
+    ->allowedFilters([
+        AllowedFilter::exact('name')->nullable(),
+        AllowedFilter::scope('permission')->nullable(),
+    ])
+    ->get();
+```
+

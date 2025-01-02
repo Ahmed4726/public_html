@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
+/**
+ * @template TModelClass of \Illuminate\Database\Eloquent\Model
+ * @template-implements \Spatie\QueryBuilder\Filters\Filter<TModelClass>
+ */
 class FiltersExact implements Filter
 {
     protected $relationConstraints = [];
@@ -19,6 +23,7 @@ class FiltersExact implements Filter
         $this->addRelationConstraint = $addRelationConstraint;
     }
 
+    /** {@inheritdoc} */
     public function __invoke(Builder $query, $value, string $property)
     {
         if ($this->addRelationConstraint) {
@@ -48,7 +53,7 @@ class FiltersExact implements Filter
             return false;
         }
 
-        $firstRelationship = Str::camel(explode('.', $property)[0]);
+        $firstRelationship = explode('.', $property)[0];
 
         if (! method_exists($query->getModel(), $firstRelationship)) {
             return false;
@@ -62,7 +67,7 @@ class FiltersExact implements Filter
         [$relation, $property] = collect(explode('.', $property))
             ->pipe(function (Collection $parts) {
                 return [
-                    $parts->except(count($parts) - 1)->map([Str::class, 'camel'])->implode('.'),
+                    $parts->except(count($parts) - 1)->implode('.'),
                     $parts->last(),
                 ];
             });

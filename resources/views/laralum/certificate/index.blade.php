@@ -98,8 +98,13 @@
 </div>
 
 @endsection
+<!-- SweetAlert2 CSS -->
+
+<!-- SweetAlert2 JS -->
 
 @section('css')
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
     <style>
         .mini.button {
             margin: 1px !important;
@@ -108,37 +113,52 @@
 @endsection
 
 @section('js')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     @include('laralum.include.jquery-ui')
 
     <script>
-        $(document).ready(function() {
-            // Enable/Disable the bulk delete button
-            $('#select-all').on('change', function() {
-                var checked = $(this).prop('checked');
-                $('.certificate-checkbox').prop('checked', checked);
-                toggleBulkDeleteButton();
-            });
+      $(document).ready(function() {
+    // Enable/Disable the bulk delete button
+    $('#select-all').on('change', function() {
+        var checked = $(this).prop('checked');
+        $('.certificate-checkbox').prop('checked', checked);
+        toggleBulkDeleteButton();
+    });
 
-            $('.certificate-checkbox').on('change', function() {
-                toggleBulkDeleteButton();
-            });
+    $('.certificate-checkbox').on('change', function() {
+        toggleBulkDeleteButton();
+    });
 
-            function toggleBulkDeleteButton() {
-                if ($('.certificate-checkbox:checked').length > 0) {
-                    $('#bulk-delete-button').prop('disabled', false);
-                } else {
-                    $('#bulk-delete-button').prop('disabled', true);
-                }
-            }
+    function toggleBulkDeleteButton() {
+        if ($('.certificate-checkbox:checked').length > 0) {
+            $('#bulk-delete-button').prop('disabled', false);
+        } else {
+            $('#bulk-delete-button').prop('disabled', true);
+        }
+    }
 
-            // Bulk delete confirmation modal
-            $('#bulk-delete-form').on('submit', function(e) {
-                e.preventDefault();
-                var selectedIds = $('.certificate-checkbox:checked').map(function() {
-                    return $(this).val();
-                }).get();
+    // Bulk delete confirmation with SweetAlert
+    $('#bulk-delete-form').on('submit', function(e) {
+        e.preventDefault();
+        var selectedIds = $('.certificate-checkbox:checked').map(function() {
+            return $(this).val();
+        }).get();
 
-                if (selectedIds.length > 0) {
+        if (selectedIds.length > 0) {
+            alert('ok')
+            // SweetAlert2 confirmation
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This action will delete the selected certificates!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete them!',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Proceed with deletion
                     $.ajax({
                         url: '/admin/certificate/bulkDelete',
                         method: 'POST',
@@ -147,31 +167,39 @@
                             selected_certificates: selectedIds
                         },
                         success: function(response) {
-                            window.location.reload(); // Reload the page to reflect changes
+                            // Reload the page after successful delete
+                            // window.location.reload();
                         },
                         error: function() {
-                            alert('An error occurred. Please try again.');
+                            Swal.fire('Error!', 'An error occurred while deleting. Please try again.', 'error');
                         }
                     });
+                } else {
+                    // If the user cancels, do nothing
+                    return false;
                 }
             });
+        }
+    });
 
-            $( "#from" ).datepicker({
-                dateFormat: 'yy-mm-dd',
-                changeMonth: true,
-                changeYear: true,
-                onClose: function( selectedDate ) {
-                    $( "#to" ).datepicker( "option", "minDate", selectedDate );
-                }
-            });
-            $( "#to" ).datepicker({
-                dateFormat: 'yy-mm-dd',
-                changeMonth: true,
-                changeYear: true,
-                onClose: function( selectedDate ) {
-                    $( "#from" ).datepicker( "option", "maxDate", selectedDate );
-                }
-            });
-        });
+    // Datepicker initialization
+    $( "#from" ).datepicker({
+        dateFormat: 'yy-mm-dd',
+        changeMonth: true,
+        changeYear: true,
+        onClose: function( selectedDate ) {
+            $( "#to" ).datepicker( "option", "minDate", selectedDate );
+        }
+    });
+    $( "#to" ).datepicker({
+        dateFormat: 'yy-mm-dd',
+        changeMonth: true,
+        changeYear: true,
+        onClose: function( selectedDate ) {
+            $( "#from" ).datepicker( "option", "maxDate", selectedDate );
+        }
+    });
+});
+
     </script>
 @endsection

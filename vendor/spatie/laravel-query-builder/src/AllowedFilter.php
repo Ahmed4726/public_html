@@ -4,7 +4,9 @@ namespace Spatie\QueryBuilder;
 
 use Illuminate\Support\Collection;
 use Spatie\QueryBuilder\Filters\Filter;
+use Spatie\QueryBuilder\Filters\FiltersBeginsWithStrict;
 use Spatie\QueryBuilder\Filters\FiltersCallback;
+use Spatie\QueryBuilder\Filters\FiltersEndsWithStrict;
 use Spatie\QueryBuilder\Filters\FiltersExact;
 use Spatie\QueryBuilder\Filters\FiltersPartial;
 use Spatie\QueryBuilder\Filters\FiltersScope;
@@ -12,7 +14,7 @@ use Spatie\QueryBuilder\Filters\FiltersTrashed;
 
 class AllowedFilter
 {
-    /** @var \Spatie\QueryBuilder\Filters\Filter */
+    /** @var Filter */
     protected $filterClass;
 
     /** @var string */
@@ -26,6 +28,12 @@ class AllowedFilter
 
     /** @var mixed */
     protected $default;
+
+    /** @var bool */
+    protected $hasDefault = false;
+
+    /** @var bool */
+    protected $nullable = false;
 
     public function __construct(string $name, Filter $filterClass, ?string $internalName = null)
     {
@@ -42,7 +50,7 @@ class AllowedFilter
     {
         $valueToFilter = $this->resolveValueForFiltering($value);
 
-        if (is_null($valueToFilter)) {
+        if (! $this->nullable && is_null($valueToFilter)) {
             return;
         }
 
@@ -70,6 +78,20 @@ class AllowedFilter
         return new static($name, new FiltersPartial($addRelationConstraint), $internalName);
     }
 
+    public static function beginsWithStrict(string $name, $internalName = null, bool $addRelationConstraint = true, string $arrayValueDelimiter = null): self
+    {
+        static::setFilterArrayValueDelimiter($arrayValueDelimiter);
+
+        return new static($name, new FiltersBeginsWithStrict($addRelationConstraint), $internalName);
+    }
+
+    public static function endsWithStrict(string $name, $internalName = null, bool $addRelationConstraint = true, string $arrayValueDelimiter = null): self
+    {
+        static::setFilterArrayValueDelimiter($arrayValueDelimiter);
+
+        return new static($name, new FiltersEndsWithStrict($addRelationConstraint), $internalName);
+    }
+
     public static function scope(string $name, $internalName = null, string $arrayValueDelimiter = null): self
     {
         static::setFilterArrayValueDelimiter($arrayValueDelimiter);
@@ -94,6 +116,11 @@ class AllowedFilter
         static::setFilterArrayValueDelimiter($arrayValueDelimiter);
 
         return new static($name, $filterClass, $internalName);
+    }
+
+    public function getFilterClass(): Filter
+    {
+        return $this->filterClass;
     }
 
     public function getName(): string
@@ -127,7 +154,12 @@ class AllowedFilter
 
     public function default($value): self
     {
+        $this->hasDefault = true;
         $this->default = $value;
+
+        if (is_null($value)) {
+            $this->nullable(true);
+        }
 
         return $this;
     }
@@ -139,13 +171,28 @@ class AllowedFilter
 
     public function hasDefault(): bool
     {
-        return isset($this->default);
+        return $this->hasDefault;
+    }
+
+    public function nullable(bool $nullable = true): self
+    {
+        $this->nullable = $nullable;
+
+        return $this;
+    }
+
+    public function unsetDefault(): self
+    {
+        $this->hasDefault = false;
+        unset($this->default);
+
+        return $this;
     }
 
     protected function resolveValueForFiltering($value)
     {
         if (is_array($value)) {
-            $remainingProperties = array_diff_assoc($value, $this->ignored->toArray());
+            $remainingProperties = array_map([$this, 'resolveValueForFiltering'], $value);
 
             return ! empty($remainingProperties) ? $remainingProperties : null;
         }

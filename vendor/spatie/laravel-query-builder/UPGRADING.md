@@ -1,6 +1,42 @@
 # Upgrading
 
-Because there are many breaking changes an upgrade is not that easy. There are many edge cases this guide does not cover. We accept PRs to improve this guide.
+## Notice when upgrading to 5.6.0
+
+The changes to the `default()` method break backwards compatibility when setting the default value to `null` (`default(null)`). This is pretty much an edge case, but if you're trying to unset the default value, you can use the `unsetDefault()` method instead. 
+
+## From v4 to v5
+
+This version adds support for Laravel 9 and drops support for all older version.
+
+Appending attributes to a query was removed to make package maintenance easier. The rest of the public API was not changed, so you'll be able to upgrade without making any changes.
+
+## From v3 to v4
+
+The biggest change in v4 is the way requested filters, includes and fields are processed. In previous versions we would automatically camel-case relationship names for includes and nested filters. Requested (nested) fields would also be transformed to their plural snake-case form, regardless of what was actually requested.
+
+In v4 we've removed this behaviour and will instead always pass the requested filter, include or field from the request URL to the query.
+
+When following Laravel's convention of camelcase relationship names, a request will look like this:
+
+```
+GET /api/users
+        ?include=latestPosts,friendRequests
+        &filter[homeAddress.city]=Antwerp
+        &fields[related_models.test_models]=id,name
+```
+
+A minimal `QueryBuilder` for the above request looks like this:
+
+```php
+use Spatie\QueryBuilder\QueryBuilder;
+
+QueryBuilder::for(User::class)
+    ->allowedIncludes(['latestPosts', 'friendRequests'])
+    ->allowedFilters(['homeAddress.city'])
+    ->allowedFields(['related_models.test_models.id', 'related_models.test_models.name']);
+```
+
+There is no automated upgrade path available at this time.
 
 ## From v2 to v3
 

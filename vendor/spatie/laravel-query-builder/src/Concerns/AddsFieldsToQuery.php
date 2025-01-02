@@ -10,10 +10,9 @@ use Spatie\QueryBuilder\Exceptions\UnknownIncludedFieldsQuery;
 
 trait AddsFieldsToQuery
 {
-    /** @var \Illuminate\Support\Collection */
-    protected $allowedFields;
+    protected ?Collection $allowedFields = null;
 
-    public function allowedFields($fields): self
+    public function allowedFields($fields): static
     {
         if ($this->allowedIncludes instanceof Collection) {
             throw new AllowedFieldsMustBeCalledBeforeAllowedIncludes();
@@ -37,7 +36,9 @@ trait AddsFieldsToQuery
     {
         $modelTableName = $this->getModel()->getTable();
 
-        $modelFields = $this->request->fields()->get($modelTableName);
+        $fields = $this->request->fields();
+
+        $modelFields = $fields->has($modelTableName) ? $fields->get($modelTableName) : $fields->get('_');
 
         if (empty($modelFields)) {
             return;
@@ -50,9 +51,13 @@ trait AddsFieldsToQuery
 
     public function getRequestedFieldsForRelatedTable(string $relation): array
     {
-        $fields = $this->request->fields()->mapWithKeys(function ($fields, $relation) {
-            return [Str::camel($relation) => $fields];
-        })->get($relation);
+        $tableOrRelation = config('query-builder.convert_relation_names_to_snake_case_plural', true)
+            ? Str::plural(Str::snake($relation))
+            : $relation;
+
+        $fields = $this->request->fields()
+            ->mapWithKeys(fn ($fields, $table) => [$table => $fields])
+            ->get($tableOrRelation);
 
         if (! $fields) {
             return [];
@@ -69,13 +74,13 @@ trait AddsFieldsToQuery
 
     protected function ensureAllFieldsExist()
     {
+        $modelTable = $this->getModel()->getTable();
+
         $requestedFields = $this->request->fields()
-            ->map(function ($fields, $model) {
-                $tableName = Str::snake(preg_replace('/-/', '_', $model));
+            ->map(function ($fields, $model) use ($modelTable) {
+                $tableName = $model;
 
-                $fields = array_map([Str::class, 'snake'], $fields);
-
-                return $this->prependFieldsWithTableName($fields, $tableName);
+                return $this->prependFieldsWithTableName($fields, $model === '_' ? $modelTable : $tableName);
             })
             ->flatten()
             ->unique();

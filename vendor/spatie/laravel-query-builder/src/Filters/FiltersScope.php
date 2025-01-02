@@ -13,13 +13,18 @@ use ReflectionParameter;
 use ReflectionUnionType;
 use Spatie\QueryBuilder\Exceptions\InvalidFilterValue;
 
+/**
+ * @template TModelClass of \Illuminate\Database\Eloquent\Model
+ * @template-implements \Spatie\QueryBuilder\Filters\Filter<TModelClass>
+ */
 class FiltersScope implements Filter
 {
+    /** {@inheritdoc} */
     public function __invoke(Builder $query, $values, string $property): Builder
     {
         $propertyParts = collect(explode('.', $property));
 
-        $scope = Str::camel($propertyParts->pop());
+        $scope = Str::camel($propertyParts->pop()); // TODO: Make this configurable?
 
         $values = array_values(Arr::wrap($values));
         $values = $this->resolveParameters($query, $values, $scope);

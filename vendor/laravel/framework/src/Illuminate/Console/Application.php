@@ -15,6 +15,7 @@ use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
@@ -62,6 +63,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public function __construct(Container $laravel, Dispatcher $events, $version)
     {
+        // dd($version);
         parent::__construct('Laravel Framework', $version);
 
         $this->laravel = $laravel;
@@ -79,7 +81,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      *
      * @return int
      */
-    public function run(InputInterface $input = null, OutputInterface $output = null)
+    public function run(InputInterface $input = null, OutputInterface $output = null): int
     {
         $commandName = $this->getCommandName(
             $input = $input ?: new ArgvInput
@@ -286,7 +288,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      *
      * @return \Symfony\Component\Console\Input\InputDefinition
      */
-    protected function getDefaultInputDefinition()
+    protected function getDefaultInputDefinition(): InputDefinition
     {
         return tap(parent::getDefaultInputDefinition(), function ($definition) {
             $definition->addOption($this->getEnvironmentOption());

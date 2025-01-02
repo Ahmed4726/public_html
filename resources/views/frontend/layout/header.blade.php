@@ -51,6 +51,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.10/jquery.lazy.min.js"></script>
 
     @php
+    use App\Setting;
+    $setting = Setting::first();
     if($setting->custom_css){
     echo "<style>
         $setting->custom_css

@@ -200,7 +200,7 @@
             <form method="POST" action="/admin/student-email-apply/bulk-delete">
                 @csrf
                 <button type="submit" class="ui red button" id="bulk-delete-btn" disabled>
-                    <i class="trash red alternate outline icon"></i> Delete Selected
+                     Delete Selected
                 </button>
             <table class="ui selectable padded compact striped celled small table">
                 <thead>
@@ -376,6 +376,9 @@
 @section('js')
 @include('laralum.include.flatpickr')
 @include('laralum.include.vue.vue-axios')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
 <script type="text/javascript">
     new Vue({
         el : "#vue-app",
@@ -413,7 +416,33 @@
 
     // Initially check the state of the checkboxes
     toggleBulkDeleteButton();
+
+    // Bulk delete confirmation with SweetAlert
+    $('#bulk-delete-btn').on('click', function(e) {
+        e.preventDefault();
+
+        // SweetAlert confirmation before performing the bulk delete
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This action will delete all selected items!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete them!',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Perform the bulk delete action here (you can trigger the form submit, or any other action)
+                // For example, if you are submitting a form for bulk delete:
+                $('#bulk-delete-form').submit(); // Ensure this is your form for bulk delete
+            } else {
+                // If canceled, do nothing
+                return false;
+            }
+        });
+    });
 });
+
 
     $(document).ready( function() {
         flatpickr("#range", {mode: "range"});

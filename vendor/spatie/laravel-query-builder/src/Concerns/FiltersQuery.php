@@ -10,7 +10,7 @@ trait FiltersQuery
     /** @var \Illuminate\Support\Collection */
     protected $allowedFilters;
 
-    public function allowedFilters($filters): self
+    public function allowedFilters($filters): static
     {
         $filters = is_array($filters) ? $filters : func_get_args();
 
@@ -62,7 +62,7 @@ trait FiltersQuery
 
     protected function ensureAllFiltersExist()
     {
-        if (config('query-builder.disable_invalid_filter_query_exception')) {
+        if (config('query-builder.disable_invalid_filter_query_exception', false)) {
             return;
         }
 
